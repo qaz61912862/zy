@@ -37,6 +37,11 @@ export default defineComponent({
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  emits: {
+    'close-w': (payload: any) => {
+      return payload.type === 'close'
+    }
   }
 })
 </script>
