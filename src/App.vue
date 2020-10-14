@@ -2,9 +2,6 @@
   <div class="container">
     <global-header :user="user"/>
     <column-list :list="list"/>
-    <div ref="parentDiv">
-      <div ref="childDiv"></div>
-    </div>
   </div>
 </template>
 <script lang="ts">
