@@ -1,18 +1,19 @@
 <template>
   <div class="validate-input-container pb-3">
     <input
-      type="text"
+      @input="emitInput"
       class="form-control"
       :class="{'is-invalid': inputRef.error}"
-      v-model="inputRef.val"
+      :value="inputRef.val"
       @blur="validateInput"
+      v-bind="$attrs"
     />
     <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, PropType } from 'vue'
-interface RuleProp{
+import { defineComponent, PropType, reactive } from 'vue'
+interface RuleProp {
   type: 'required' | 'email';
   message: string;
 }
@@ -20,19 +21,27 @@ export type RulesProp = RuleProp[]
 const emailReg = /^[A-Za-zd0-9]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/
 export default defineComponent({
   props: {
-    rules: {
-      type: Array as PropType<RulesProp>
+    rules: Array as PropType<RulesProp>,
+    modelValue: {
+      type: String
     }
   },
-  setup (props) {
+  emits: ['update:modelValue'],
+  inheritAttrs: false,
+  setup (props, { emit, attrs }) {
+    console.log(attrs)
     const inputRef = reactive({
-      val: '',
+      val: props.modelValue || '', // 赋默认值
       error: false,
       message: ''
     })
+    const emitInput = (e: KeyboardEvent) => {
+      inputRef.val = (e.target as HTMLInputElement).value
+      emit('update:modelValue', inputRef.val)
+    }
     const validateInput = () => {
       if (props.rules) {
-        const isAllPassed = props.rules.every(rule => {
+        const allPassed = props.rules.every(rule => {
           let passed = true
           inputRef.message = rule.message
           switch (rule.type) {
@@ -40,19 +49,20 @@ export default defineComponent({
               passed = (inputRef.val.trim() !== '')
               break
             case 'email':
-              passed = emailReg.test(inputRef.val)
+              passed = (emailReg.test(inputRef.val))
               break
             default:
               break
           }
           return passed
         })
-        inputRef.error = !isAllPassed
+        inputRef.error = !allPassed
       }
     }
     return {
       inputRef,
-      validateInput
+      validateInput,
+      emitInput
     }
   }
 })
