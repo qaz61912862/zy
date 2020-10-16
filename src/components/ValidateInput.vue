@@ -12,13 +12,15 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, reactive } from 'vue'
+import { defineComponent, PropType, reactive, onMounted } from 'vue'
+import { emitter } from './ValidateForm.vue'
 interface RuleProp {
-  type: 'required' | 'email';
+  type: 'required' | 'validate';
   message: string;
+  validate?: RegExp;
 }
 export type RulesProp = RuleProp[]
-const emailReg = /^[A-Za-zd0-9]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/
+// const emailReg = /^[A-Za-zd0-9]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/
 export default defineComponent({
   props: {
     rules: Array as PropType<RulesProp>,
@@ -28,8 +30,7 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   inheritAttrs: false,
-  setup (props, { emit, attrs }) {
-    console.log(attrs)
+  setup (props, { emit }) {
     const inputRef = reactive({
       val: props.modelValue || '', // 赋默认值
       error: false,
@@ -48,8 +49,10 @@ export default defineComponent({
             case 'required':
               passed = (inputRef.val.trim() !== '')
               break
-            case 'email':
-              passed = (emailReg.test(inputRef.val))
+            case 'validate':
+              if (rule.validate) {
+                passed = rule.validate && (rule.validate.test(inputRef.val))
+              }
               break
             default:
               break
@@ -57,8 +60,14 @@ export default defineComponent({
           return passed
         })
         inputRef.error = !allPassed
+        return allPassed // 此处allPassed是指单个组件的每一个规则都通过
       }
+      return true
     }
+    onMounted(() => {
+      // 创建完成把校验传到父组件,但未执行,触发submit才执行
+      emitter.emit('form-item-created', validateInput)
+    })
     return {
       inputRef,
       validateInput,
