@@ -5,12 +5,11 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, onMounted } from 'vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { useStore } from 'vuex'
 import ColumnList from '../components/ColumnList.vue'
 import { GlobalDataProps } from '../store'
-
 export default defineComponent({
   name: 'Home',
   components: {
@@ -18,6 +17,9 @@ export default defineComponent({
   },
   setup () {
     const store = useStore<GlobalDataProps>()
+    onMounted(() => {
+      store.dispatch('fetchColumns')
+    })
     const list = computed(() => store.state.columns)
     const biggerColumnsLen = store.getters.biggerColumnsLen
     return {

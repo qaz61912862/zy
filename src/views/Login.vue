@@ -13,7 +13,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, reactive, Ref, ref } from 'vue'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import { useRouter } from 'vue-router'
@@ -25,7 +25,7 @@ export default defineComponent({
     ValidateForm
   },
   setup () {
-    const inputRef = ref<any>()
+    const inputRef = ref<Ref>()
     const store = useStore()
     const router = useRouter()
     const params = reactive({
