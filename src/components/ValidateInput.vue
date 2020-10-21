@@ -1,6 +1,16 @@
 <template>
   <div class="validate-input-container pb-3">
     <input
+      v-if="tag === 'input'"
+      @input="emitInput"
+      class="form-control"
+      :class="{'is-invalid': inputRef.error}"
+      :value="inputRef.val"
+      @blur="validateInput"
+      v-bind="$attrs"
+    />
+    <textarea
+      v-else
       @input="emitInput"
       class="form-control"
       :class="{'is-invalid': inputRef.error}"
@@ -20,12 +30,17 @@ interface RuleProp {
   validate?: RegExp;
 }
 export type RulesProp = RuleProp[]
+export type TagType = 'input' | 'textarea'
 // const emailReg = /^[A-Za-zd0-9]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/
 export default defineComponent({
   props: {
     rules: Array as PropType<RulesProp>,
     modelValue: {
       type: String
+    },
+    tag: {
+      type: String as PropType<TagType>,
+      default: 'input'
     }
   },
   emits: ['update:modelValue'],

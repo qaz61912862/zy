@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    {{biggerColumnsLen}}
     <column-list :list="list"/>
   </div>
 </template>
@@ -18,8 +19,10 @@ export default defineComponent({
   setup () {
     const store = useStore<GlobalDataProps>()
     const list = computed(() => store.state.columns)
+    const biggerColumnsLen = store.getters.biggerColumnsLen
     return {
-      list
+      list,
+      biggerColumnsLen
     }
   }
 })
