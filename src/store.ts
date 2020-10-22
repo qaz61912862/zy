@@ -1,5 +1,5 @@
-import { createStore } from 'vuex'
-import { testData, testPosts, ColumnProps, PostProps } from './testData'
+import { createStore, Commit } from 'vuex'
+import { testData, ColumnProps, PostProps } from './testData'
 import getters from './getters'
 import axios from 'axios'
 interface UserProps {
@@ -9,14 +9,20 @@ interface UserProps {
   columnId?: number;
 }
 export interface GlobalDataProps {
+  loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];
   user: UserProps;
 }
+const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
+  const { data } = await axios.get(url)
+  commit(mutationName, data)
+}
 const store = createStore<GlobalDataProps>({
   state: {
+    loading: false,
     columns: testData,
-    posts: testPosts,
+    posts: [],
     user: {
       isLogin: false,
       columnId: 1
@@ -35,13 +41,34 @@ const store = createStore<GlobalDataProps>({
     },
     fetchColumns (state, rawData) {
       state.columns = rawData.data.list
+    },
+    fetchColumn (state, rawData) {
+      state.columns = [rawData.data]
+    },
+    fetchPosts (state, rawData) {
+      state.posts = rawData.data.list
+    },
+    setLoading (state, status) {
+      state.loading = status
     }
   },
   actions: {
-    fetchColumns ({ commit }) {
-      axios.get('/columns?currentPage=1&pageSize=5').then(res => {
-        commit('fetchColumns', res.data)
-      })
+    async fetchColumns ({ commit }) {
+      getAndCommit('/columns?currentPage=1&pageSize=5', 'fetchColumns', commit)
+      // const { data } = await axios.get('/columns?currentPage=1&pageSize=5')
+      // commit('fetchColumns', data)
+    },
+    fetchColumn ({ commit }, cid) {
+      getAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+      // axios.get(`/columns/${cid}`).then(res => {
+      //   commit('fetchColumn', res.data)
+      // })
+    },
+    fetchPosts ({ commit }, cid) {
+      getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+      // axios.get(`/columns/${cid}/posts`).then(res => {
+      //   commit('fetchPosts', res.data)
+      // })
     }
   },
   getters

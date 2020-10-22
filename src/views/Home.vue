@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    {{biggerColumnsLen}}
+    <!-- {{biggerColumnsLen}} -->
     <column-list :list="list"/>
   </div>
 </template>
