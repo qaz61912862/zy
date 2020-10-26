@@ -14,6 +14,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, Ref, ref } from 'vue'
+// import { login } from '../api'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import { useRouter } from 'vue-router'
@@ -49,10 +50,15 @@ export default defineComponent({
         message: '密码不能为空'
       }
     ]
-    const onFormSubmit = (result: boolean) => {
+    const onFormSubmit = async (result: boolean) => {
       if (result) {
-        store.commit('login')
-        router.push('/')
+        try {
+          const data = await store.dispatch('loginAndFetch', params)
+          console.log(data)
+          router.push('/')
+        } catch (err) {
+          console.log(err)
+        }
       }
     }
     return {

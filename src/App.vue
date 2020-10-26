@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <global-header :user="user"/>
+    {{error}}
     <!-- <loader v-if="isLoading"/> -->
     <!-- <h-button type="primary">按钮</h-button>
     <h-radio v-model="radio" label="2">北京烤鸭</h-radio>
@@ -11,8 +12,11 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue'
+import { defineComponent, computed, ref, isReactive, reactive, toRaw, onMounted } from 'vue'
+import { GlobalDataProps } from './store'
+import axios from 'axios'
 import { useStore } from 'vuex'
+import { app } from './main'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import GlobalHeader from './components/GlobalHeader.vue'
 import Loader from './components/Loader.vue'
@@ -23,14 +27,27 @@ export default defineComponent({
     Loader
   },
   setup () {
+    console.log(app.config.globalProperties)
     const radio = ref('1')
-    const store = useStore()
+    const radio2 = reactive({
+      count: 0
+    })
+    const error = computed(() => store.state.error)
+    const store = useStore<GlobalDataProps>()
     const currentUser = computed(() => store.state.user)
     const isLoading = computed(() => store.state.loading)
+    onMounted(() => {
+      if (!store.state.user.isLogin && localStorage.getItem('token')) {
+        axios.defaults.headers.common.Authorization = `Bearer ${localStorage.getItem('token')}`
+        store.dispatch('fetchCurrentUser')
+      }
+    })
     return {
+      error,
       user: currentUser,
       isLoading,
-      radio
+      radio,
+      radio2
     }
   }
 })
