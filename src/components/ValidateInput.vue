@@ -25,9 +25,10 @@
 import { defineComponent, PropType, reactive, onMounted } from 'vue'
 import { emitter } from './ValidateForm.vue'
 interface RuleProp {
-  type: 'required' | 'validate';
+  type: 'required' | 'validate' | 'custom';
   message: string;
   validate?: RegExp;
+  validator?: () => boolean;
 }
 export type RulesProp = RuleProp[]
 export type TagType = 'input' | 'textarea'
@@ -68,6 +69,9 @@ export default defineComponent({
               if (rule.validate) {
                 passed = rule.validate && (rule.validate.test(inputRef.val))
               }
+              break
+            case 'custom':
+              passed = rule.validator ? rule.validator() : true
               break
             default:
               break

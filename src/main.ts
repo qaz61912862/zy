@@ -7,6 +7,7 @@ import hansonggoruia from 'hansonggoruia'
 import 'hansonggoruia/dist/index.css'
 axios.defaults.baseURL = '/h/api'
 axios.interceptors.request.use(config => {
+  store.commit('setError', { status: false, message: '' })
   store.commit('setLoading', true)
   return config
 }, function (e) {

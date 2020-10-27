@@ -3,11 +3,11 @@
     <validate-form style="text-align: left" @form-submit="onFormSubmit">
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">Email address</label>
-        <validate-input ref="inputRef" type="text" placeholder="请选择" v-model="params.email" :rules="emailRules"/>
+        <validate-input ref="inputRef" type="text" placeholder="请输入" v-model="params.email" :rules="emailRules"/>
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">Password</label>
-        <validate-input type="password" placeholder="请选择" v-model="params.password" :rules="passwordRules"/>
+        <validate-input type="password" placeholder="请输入" v-model="params.password" :rules="passwordRules"/>
       </div>
     </validate-form>
   </div>
@@ -17,6 +17,7 @@ import { defineComponent, reactive, Ref, ref } from 'vue'
 // import { login } from '../api'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
+import createMessage from '../components/createMessage'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 export default defineComponent({
@@ -53,9 +54,11 @@ export default defineComponent({
     const onFormSubmit = async (result: boolean) => {
       if (result) {
         try {
-          const data = await store.dispatch('loginAndFetch', params)
-          console.log(data)
-          router.push('/')
+          await store.dispatch('loginAndFetch', params)
+          createMessage('登录成功 2秒后跳转首页', 'success')
+          setTimeout(() => {
+            router.push('/')
+          }, 2000)
         } catch (err) {
           console.log(err)
         }
