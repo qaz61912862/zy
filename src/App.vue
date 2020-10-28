@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <!-- {{isLogin}} -->
     <global-header :user="user"/>
     <!-- <loader v-if="isLoading"/> -->
     <!-- <h-button type="primary">按钮</h-button>
@@ -36,6 +37,7 @@ export default defineComponent({
     const error = computed(() => store.state.error)
     const currentUser = computed(() => store.state.user)
     const isLoading = computed(() => store.state.loading)
+    const isLogin = computed(() => store.state.user.isLogin)
     watch(() => error.value.status, () => {
       const { status, message } = error.value
       if (status && message) {
@@ -53,7 +55,8 @@ export default defineComponent({
       user: currentUser,
       isLoading,
       radio,
-      radio2
+      radio2,
+      isLogin
     }
   }
 })
