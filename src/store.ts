@@ -91,7 +91,7 @@ const store = createStore<GlobalDataProps>({
   },
   actions: {
     fetchColumns ({ commit }) {
-      return getAndCommit('/columns?currentPage=1&pageSize=5', 'fetchColumns', commit)
+      return getAndCommit('/columns?currentPage=1&pageSize=999', 'fetchColumns', commit)
       // const { data } = await axios.get('/columns?currentPage=1&pageSize=5')
       // commit('fetchColumns', data)
     },

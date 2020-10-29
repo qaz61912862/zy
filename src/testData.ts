@@ -6,7 +6,7 @@ export interface ColumnProps {
 }
 interface ImageProps {
   id?: string;
-  url: string;
+  url?: string;
   createdAt?: string;
 }
 export interface PostProps {
