@@ -1,11 +1,18 @@
 <template>
   <div class="file-upload">
-    <button class="btn btn-primary" @click.prevent="triggerUpload">
-      <span v-if="fileStatus === 'loading'">正在上传...</span>
-      <span v-else-if="fileStatus === 'success'">上传成功</span>
-      <span v-else>上传</span>
+    <div class="file-upload-container" @click.prevent="triggerUpload" v-bind="$attrs">
+      <slot name="loading" v-if="fileStatus === 'loading'">
+        <button class="btn btn-primary">正在上传...</button>
+      </slot>
+      <slot name="uploaded" v-else-if="fileStatus === 'success'" :uploadedData="uploadedData">
+        <button class="btn btn-primary">上传成功</button>
+      </slot>
+      <slot v-else name="default">
+        <button class="btn btn-primary">上传</button>
+      </slot>
       <!-- <span v-if="fileStatus === 'ready'">上传</span> -->
-    </button>
+    </div>
+    <span v-if="fileStatus === 'success'" @click="deleteFile">删除</span>
     <input type="file" class="file-input d-none" ref="fileInput" @change="handleFileChange" />
   </div>
 </template>
@@ -24,13 +31,23 @@ export default defineComponent({
       type: Function as PropType<CheckFunction>
     }
   },
-  setup (props) {
+  inheritAttrs: false,
+  emits: ['file-uploaded', 'file-uploaded-error'],
+  setup (props, { emit }) {
     const fileInput = ref<HTMLInputElement | null>(null)
     const fileStatus = ref<UploadStatus>('ready')
+    const uploadedData = ref()
     const triggerUpload = (e: Event) => {
       console.log(e)
       if (fileInput.value) {
         fileInput.value.click()// 按钮触发input组件点击
+      }
+    }
+    const deleteFile = () => {
+      if (fileInput.value) {
+        fileInput.value.value = ''
+        fileStatus.value = 'ready'
+        uploadedData.value = {}
       }
     }
     const handleFileChange = (e: Event) => {
@@ -50,9 +67,11 @@ export default defineComponent({
             'Content-Type': 'multipart/form-data'
           }
         }).then(res => {
-          console.log(res)
+          emit('file-uploaded', res.data)
+          uploadedData.value = res.data
           fileStatus.value = 'success'
-        }).catch(() => {
+        }).catch(error => {
+          emit('file-uploaded-error', { error })
           fileStatus.value = 'error'
         }).finally(() => {
           if (fileInput.value) {
@@ -65,7 +84,9 @@ export default defineComponent({
       fileInput,
       triggerUpload,
       fileStatus,
-      handleFileChange
+      handleFileChange,
+      uploadedData,
+      deleteFile
     }
   }
 })

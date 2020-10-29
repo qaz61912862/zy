@@ -9,6 +9,16 @@ export interface UserProps {
   column?: string;
   email?: string;
 }
+export interface ResponseType<P = {}> {
+  code: number;
+  msg: string;
+  data: P
+}
+export interface ImageProps {
+  _id?: string;
+  url?: string;
+  createdAt?: string;
+}
 export interface GlobalDataProps {
   error: GlobalErrorProps;
   token: string;
@@ -23,7 +33,7 @@ export interface GlobalErrorProps {
 }
 const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
   const { data } = await axios.get(url)
-  commit(mutationName, data)
+  return commit(mutationName, data)
 }
 const postAndCommit = async (url: string, mutationName: string, commit: Commit, payload: any) => {
   const { data } = await axios.post(url, payload)
@@ -67,6 +77,11 @@ const store = createStore<GlobalDataProps>({
     setError (state, val: GlobalErrorProps) {
       state.error = val
     },
+    logout (state) {
+      state.token = ''
+      localStorage.remove('token')
+      delete axios.defaults.headers.common.Authorization
+    },
     fetchCurrentUser (state, rawData) {
       state.user = {
         isLogin: true,
@@ -75,19 +90,19 @@ const store = createStore<GlobalDataProps>({
     }
   },
   actions: {
-    async fetchColumns ({ commit }) {
-      getAndCommit('/columns?currentPage=1&pageSize=5', 'fetchColumns', commit)
+    fetchColumns ({ commit }) {
+      return getAndCommit('/columns?currentPage=1&pageSize=5', 'fetchColumns', commit)
       // const { data } = await axios.get('/columns?currentPage=1&pageSize=5')
       // commit('fetchColumns', data)
     },
     fetchColumn ({ commit }, cid) {
-      getAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+      return getAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
       // axios.get(`/columns/${cid}`).then(res => {
       //   commit('fetchColumn', res.data)
       // })
     },
     fetchPosts ({ commit }, cid) {
-      getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+      return getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
       // axios.get(`/columns/${cid}/posts`).then(res => {
       //   commit('fetchPosts', res.data)
       // })
@@ -96,13 +111,16 @@ const store = createStore<GlobalDataProps>({
       return postAndCommit('/user/login', 'login', commit, payload)
     },
     fetchCurrentUser ({ commit }) {
-      getAndCommit('/user/current', 'fetchCurrentUser', commit)
+      return getAndCommit('/user/current', 'fetchCurrentUser', commit)
     },
     loginAndFetch ({ dispatch }, loginData) {
       return dispatch('login', loginData).then(() => {
         return dispatch('fetchCurrentUser')
       })
-    }
+    },
+    createPost ({ commit }, payload) {
+      return postAndCommit('/posts', 'createPost', commit, payload)
+    },
   },
   getters
 })

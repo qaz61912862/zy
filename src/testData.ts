@@ -10,13 +10,14 @@ interface ImageProps {
   createdAt?: string;
 }
 export interface PostProps {
-  _id: string;
+  _id?: string;
   excerpt?: string;
   title: string;
   content?: string;
-  image?: ImageProps;
-  createdAt: string;
+  image?: ImageProps | string;
+  createdAt?: string;
   column: string;
+  author?: string;
 }
 export const testData: ColumnProps[] = [
   {

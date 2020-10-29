@@ -44,12 +44,12 @@ export default defineComponent({
         createMessage(message, 'error')
       }
     })
-    onMounted(() => {
-      if (!store.state.user.isLogin && localStorage.getItem('token')) {
-        axios.defaults.headers.common.Authorization = `Bearer ${localStorage.getItem('token')}`
-        store.dispatch('fetchCurrentUser')
-      }
-    })
+    // onMounted(() => {
+    //   if (!store.state.user.isLogin && localStorage.getItem('token')) {
+    //     axios.defaults.headers.common.Authorization = `Bearer ${localStorage.getItem('token')}`
+    //     store.dispatch('fetchCurrentUser')
+    //   }
+    // })
     return {
       error,
       user: currentUser,

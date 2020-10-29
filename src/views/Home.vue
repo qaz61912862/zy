@@ -1,7 +1,17 @@
 <template>
   <div class="container">
     <!-- {{biggerColumnsLen}} -->
-    <uploader :beforeUpload="beforeUpload" />
+    <uploader :beforeUpload="beforeUpload" @file-uploaded="fileUploaded">
+      <!-- <button class="btn primary-btn">上传图片</button> -->
+      <!-- <template #loading>
+        <div class="spinner-border">
+          <span class="sr-only"></span>
+        </div>
+      </template> -->
+      <template #uploaded="{ uploadedData }">
+        <img :src="uploadedData.data.url" alt="" width="500" />
+      </template>
+    </uploader>
     <column-list :list="list"/>
   </div>
 </template>
@@ -11,7 +21,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { useStore } from 'vuex'
 import ColumnList from '../components/ColumnList.vue'
 import Uploader from '../components/Uploader.vue'
-import { GlobalDataProps } from '../store'
+import { GlobalDataProps, ResponseType, ImageProps } from '../store'
 import createMessage from '../components/createMessage'
 export default defineComponent({
   name: 'Home',
@@ -27,16 +37,21 @@ export default defineComponent({
     const list = computed(() => store.state.columns)
     const biggerColumnsLen = store.getters.biggerColumnsLen
     const beforeUpload = (file: File) => {
-      const isJPG = file.type === 'image/jpeg'
-      if (!isJPG) {
-        createMessage('上传图片格式只能是JPEG', 'error')
-      }
-      return isJPG
+      // const isJPG = file.type === 'image/jpeg'
+      // if (!isJPG) {
+      //   createMessage('上传图片格式只能是JPEG', 'error')
+      // }
+      // return isJPG
+      return true
+    }
+    const fileUploaded = (rawData: ResponseType<ImageProps>) => {
+      createMessage(`上传图片ID${rawData.data._id}`, 'success')
     }
     return {
       list,
       biggerColumnsLen,
-      beforeUpload
+      beforeUpload,
+      fileUploaded
     }
   }
 })
