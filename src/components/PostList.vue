@@ -1,6 +1,6 @@
 <template>
   <div class="post-list">
-    <article v-for="post in list" :key="post.column" class="card mb-3 shadow-sm">
+    <article v-for="post in list" :key="post.column" class="card mb-3 shadow-sm" @click="goDetail(post)">
       <div class="card-body">
         <h4>{{post.title}}</h4>
         <div class="row my-3 align-items-center">
@@ -19,12 +19,22 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import { useRouter } from 'vue-router'
 import { PostProps } from '../testData'
 export default defineComponent({
   props: {
     list: {
       required: true,
       type: Array as PropType<PostProps[]>
+    }
+  },
+  setup () {
+    const router = useRouter()
+    const goDetail = (post: PostProps) => {
+      router.push(`/post/${post._id}`)
+    }
+    return {
+      goDetail
     }
   }
 })

@@ -12,7 +12,7 @@ export interface UserProps {
 export interface ResponseType<P = {}> {
   code: number;
   msg: string;
-  data: P
+  data: P;
 }
 export interface ImageProps {
   _id?: string;
@@ -25,6 +25,7 @@ export interface GlobalDataProps {
   loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];
+  post: PostProps;
   user: UserProps;
 }
 export interface GlobalErrorProps {
@@ -35,7 +36,7 @@ const getAndCommit = async (url: string, mutationName: string, commit: Commit) =
   const { data } = await axios.get(url)
   return commit(mutationName, data)
 }
-const postAndCommit = async (url: string, mutationName: string, commit: Commit, payload: any) => {
+const postAndCommit = async (url: string, mutationName: string, commit: Commit, payload: {}) => {
   const { data } = await axios.post(url, payload)
   commit(mutationName, data)
   return data
@@ -49,6 +50,7 @@ const store = createStore<GlobalDataProps>({
     loading: false,
     columns: testData,
     posts: [],
+    post: {},
     user: {
       isLogin: false
     }
@@ -67,6 +69,9 @@ const store = createStore<GlobalDataProps>({
     },
     fetchColumn (state, rawData) {
       state.columns = [rawData.data]
+    },
+    fetchPost (state, rawData) {
+      state.post = rawData.data
     },
     fetchPosts (state, rawData) {
       state.posts = rawData.data.list
@@ -121,6 +126,9 @@ const store = createStore<GlobalDataProps>({
     createPost ({ commit }, payload) {
       return postAndCommit('/posts', 'createPost', commit, payload)
     },
+    fetchPost ({ commit }, pid) {
+      return getAndCommit(`/posts/${pid}`, 'fetchPost', commit)
+    }
   },
   getters
 })

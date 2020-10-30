@@ -12,9 +12,9 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref, reactive, onMounted, watch } from 'vue'
+import { defineComponent, computed, ref, reactive, watch } from 'vue'
 import { GlobalDataProps } from './store'
-import axios from 'axios'
+// import axios from 'axios'
 import { useStore } from 'vuex'
 import { app } from './main'
 import 'bootstrap/dist/css/bootstrap.min.css'

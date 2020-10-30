@@ -12,11 +12,11 @@ interface ImageProps {
 export interface PostProps {
   _id?: string;
   excerpt?: string;
-  title: string;
+  title?: string;
   content?: string;
   image?: ImageProps | string;
   createdAt?: string;
-  column: string;
+  column?: string;
   author?: string;
 }
 export const testData: ColumnProps[] = [

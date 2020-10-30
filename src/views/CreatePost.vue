@@ -91,12 +91,12 @@ export default defineComponent({
             newPost.image = imageId
           }
           store.dispatch('createPost', newPost).then(res => {
+            console.log(res)
             createMessage('发版成功, 2秒后跳转至文章', 'success', 2000)
             setTimeout(() => {
               router.push(`/column/${column}`)
             })
           })
-          
         }
       }
     }
