@@ -1,3 +1,5 @@
+import { UserProps } from './store'
+
 export interface ColumnProps {
   _id: string;
   title: string;
@@ -17,7 +19,7 @@ export interface PostProps {
   image?: ImageProps | string;
   createdAt?: string;
   column?: string;
-  author?: string;
+  author?: string | UserProps;
 }
 export const testData: ColumnProps[] = [
   {
