@@ -2,27 +2,25 @@
   <div class="validate-input-container pb-3">
     <input
       v-if="tag === 'input'"
-      @input="emitInput"
       class="form-control"
       :class="{'is-invalid': inputRef.error}"
-      :value="inputRef.val"
       @blur="validateInput"
+      v-model="inputRef.val"
       v-bind="$attrs"
     />
     <textarea
       v-else
-      @input="emitInput"
       class="form-control"
       :class="{'is-invalid': inputRef.error}"
-      :value="inputRef.val"
       @blur="validateInput"
+      v-model="inputRef.val"
       v-bind="$attrs"
     />
     <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, reactive, onMounted } from 'vue'
+import { defineComponent, PropType, reactive, onMounted, computed } from 'vue'
 import { emitter } from './ValidateForm.vue'
 interface RuleProp {
   type: 'required' | 'validate' | 'custom';
@@ -48,14 +46,15 @@ export default defineComponent({
   inheritAttrs: false,
   setup (props, { emit }) {
     const inputRef = reactive({
-      val: props.modelValue || '', // 赋默认值
+      val: computed({
+        get: () => {
+          return props.modelValue || ''
+        },
+        set: value => emit('update:modelValue', value)
+      }),
       error: false,
       message: ''
     })
-    const emitInput = (e: KeyboardEvent) => {
-      inputRef.val = (e.target as HTMLInputElement).value
-      emit('update:modelValue', inputRef.val)
-    }
     const validateInput = () => {
       if (props.rules) {
         const allPassed = props.rules.every(rule => {
@@ -89,8 +88,7 @@ export default defineComponent({
     })
     return {
       inputRef,
-      validateInput,
-      emitInput
+      validateInput
     }
   }
 })

@@ -1,5 +1,12 @@
 <template>
   <div>
+    <modal title="删除文章"
+    :visible="modalIsVisible"
+    @modal-on-close="modalIsVisible = false"
+    @modal-on-confirm="modalIsVisible = false"
+    >
+      <p>确定要删除文章吗?</p>
+    </modal>
     <img class="head-img" :src="post.image && post.image.url" />
     <h4>{{post.title}}</h4>
     <div class="author-box">
@@ -11,27 +18,32 @@
     </div>
     <div class="content" v-html="post.content"></div>
     <div v-if="showEditArea" class="btn-group mt-5">
-      <router-link :to="`/create${post._id}`" class="btn btn-success" type="button">编辑</router-link>
-      <button class="btn btn-danger" type="button">删除</button>
+      <router-link :to="`/create?id=${post._id}`" class="btn btn-success" type="button">编辑</router-link>
+      <button class="btn btn-danger" type="button" @click.prevent="modalIsVisible = true">删除</button>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, onMounted } from 'vue'
+import { defineComponent, computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { GlobalDataProps, UserProps } from '../store'
+import Modal from '../components/Modal.vue'
 import { useRoute } from 'vue-router'
-// import { PostProps } from '../testData'
+import { PostProps } from '../testData'
 export default defineComponent({
   name: 'PostDetail',
+  components: {
+    Modal
+  },
   setup () {
     const route = useRoute()
     const store = useStore<GlobalDataProps>()
+    const modalIsVisible = ref(false)
     const pid = route.params.id
     onMounted(() => {
       store.dispatch('fetchPost', pid)
     })
-    const post = computed(() => store.state.post)
+    const post = computed(() => store.state.post as PostProps)
     console.log(post.value)
     const showEditArea = computed(() => {
       const { isLogin, _id } = store.state.user as UserProps
@@ -44,7 +56,8 @@ export default defineComponent({
     })
     return {
       post,
-      showEditArea
+      showEditArea,
+      modalIsVisible
     }
   }
 })
